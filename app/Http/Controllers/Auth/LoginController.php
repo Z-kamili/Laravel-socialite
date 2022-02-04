@@ -30,19 +30,19 @@ class LoginController extends Controller
         try{
             $githubUser = Socialite::driver('github')->stateless()->user();
 
-            $user  = User::where('provider_id',$githubUser->getId())->first();
+            $user  = User::firstOrCreate(
 
-            //Create a new user in our database
+                [
+                    'provider_id' => $githubUser->getId(),
+                ],
 
-            if(!$user){
-
-                $user  =  User::create([
+                [
                     'email' => $githubUser->getEmail(),
-                    'name' => $githubUser->getName(),
-                    'provider_id'=> $githubUser->getId(),
-                ]);
+                    'name'=> $githubUser->getName(),
+                ]
 
-            }
+
+                );
      
             //Log the user in 
      
@@ -51,7 +51,7 @@ class LoginController extends Controller
             //Redirect to dashboard
             return redirect('dashboard');
 
-            
+
         }catch(\Exception $e){
 
             dd($e);
